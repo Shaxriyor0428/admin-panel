@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { request } from "../api";
-import { useSelector } from "react-redux";
 
 const ProductCreate = () => {
   const [categories, setCategories] = useState([]);
-  const token = useSelector((s) => s.token.value);
   const [error, setError] = useState("");
 
   const handleCreate = (e) => {
@@ -18,13 +16,9 @@ const ProductCreate = () => {
     product.average_rating = 0;
 
     request
-      .post("/product/create", product, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .post("/product/create", product)
       .then((res) => {
-        console.log(res);
+        // console.log(res);
         setError("");
         e.target.reset();
         alert("Product created successfully");
@@ -131,7 +125,7 @@ const ProductCreate = () => {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-300"
+            className="w-full cursor-pointer bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-300"
           >
             Create Product
           </button>

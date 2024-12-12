@@ -1,10 +1,11 @@
-import {configureStore} from "@reduxjs/toolkit"
-import token from "./slices/token-slice"
-
+import { configureStore } from "@reduxjs/toolkit";
+import token from "./slices/token-slice";
+import reload from "./slices/reload-slice";
 const store = configureStore({
-    reducer: {
-        token
-    }
-})
+  reducer: {
+    token,
+    reload,
+  },
+});
 
-export default store
+export default store;

@@ -1,6 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
+import { FaRegHeart, FaTrashAlt, FaEdit } from "react-icons/fa";
+import { request } from "../api";
+import { toggleDelete } from "../redux/slices/reload-slice";
+import { useDispatch } from "react-redux";
+import Modal from "../pages/admin/Modal";
+import ProductEdit from "../pages/admin/ProductEdit";
 
-const Products = ({ data }) => {
+const Products = ({ data, isAdmin }) => {
+  const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  const handleDelete = async (id) => {
+    try {
+      if (confirm("Are you sure?")) {
+        await request.delete(`product/delete/${id}`);
+        return dispatch(toggleDelete(true));
+      }
+    } catch (error) {
+      alert("Ma'lumotni o‘chirishda xatolik");
+    } finally {
+      // return dispatch(toggleDelete(false));
+    }
+  };
+
+  const handleEdit = (prod) => {
+    setSelectedProduct(prod);
+    setOpen(true);
+  };
+
   const productItems = data?.map((product) => (
     <div
       key={product.id}
@@ -18,15 +46,40 @@ const Products = ({ data }) => {
         <p className="text-lg text-green-600 font-bold mb-2">
           {product.price} USD
         </p>
-        <p className="text-gray-600 text-sm">{product.description}</p>
+        <p className="text-gray-600 text-sm line-clamp-2">
+          {product.description}
+        </p>
+        <div className="mt-4">
+          {isAdmin && (
+            <div className="flex gap-4">
+              <button onClick={() => handleDelete(product.id)}>
+                <FaTrashAlt className="text-xl" />
+              </button>
+              <button onClick={() => handleEdit(product)}>
+                <FaEdit className="text-xl" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   ));
 
   return (
-    <div className="container mx-auto px-4 py-10 flex gap-6 flex-wrap justify-center">
-      {productItems}
-    </div>
+    <>
+      <div className="container mx-auto px-4 py-10 flex gap-6 flex-wrap justify-center">
+        {productItems}
+      </div>
+
+      {open && selectedProduct && (
+        <Modal>
+          <ProductEdit
+            edit_data={selectedProduct}
+            close={() => setOpen(false)}
+          />
+        </Modal>
+      )}
+    </>
   );
 };
 

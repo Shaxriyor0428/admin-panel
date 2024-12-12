@@ -1,16 +1,12 @@
-import { request } from "@/api";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Products from "@/components/Products";
+import { useFetch } from "../../hooks/useFetch";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-  useEffect(() => {
-    request.get("/product/get").then((res) => setProducts(res.data));
-
-  }, []);
+  const { data } = useFetch("/product/get");
   return (
     <div>
-      <Products data={products} />
+      <Products data={data} />
     </div>
   );
 };

@@ -5,3 +5,7 @@
 .header .active {
   color: dodgerblue;
 }
+#admin .active {
+  color: black;
+  background: white;
+}
