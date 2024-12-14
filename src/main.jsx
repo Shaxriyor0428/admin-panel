@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import store from "./redux/index.js";
 import { BrowserRouter } from "react-router-dom";
 const App = lazy(() => import("./App.jsx"));
+import "number-brm"
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>

@@ -13,17 +13,17 @@ import CreateProduct from "../pages/admin/create-product/CreateProduct";
 import ManageProduct from "../pages/admin/manage-product/ManageProduct";
 import ManageCategory from "../pages/admin/manage-category/ManageCategory";
 import CreateCategory from "../pages/admin/create-category/CreateCategory";
+import { useFetch } from "../hooks/useFetch";
+import Products from "../components/Products";
 
 const Router = () => {
+  const { data } = useFetch("/product/get");
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path="register" element={<Register />} />
         <Route path="login" element={<Login />} />
-        <Route path="create-category" element={<Category />} />
-        <Route path="see-category" element={<AllCategories />} />
-        <Route path="see-one-category" element={<OneCategory />} />
+        <Route path="products" element={<Products data={data} />} />
       </Route>
 
       <Route path="/" element={<Auth />}>
@@ -32,8 +32,12 @@ const Router = () => {
           <Route path="manage-product" element={<ManageProduct />} />
           <Route path="manage-category" element={<ManageCategory />} />
           <Route path="create-category" element={<CreateCategory />} />
+          <Route path="see-one-category" element={<OneCategory />} />
+          <Route path="create-category" element={<Category />} />
+          <Route path="see-category" element={<AllCategories />} />
         </Route>
       </Route>
+      <Route path="register" element={<Register />} />
     </Routes>
   );
 };

@@ -1,84 +1,165 @@
+import { request } from "@/api";
 import React, { useState } from "react";
-import { request } from "../../api";
 import { useDispatch } from "react-redux";
-import { signIn } from "../../redux/slices/token-slice";
-import { useNavigate } from "react-router-dom";
+import { signIn } from "@/redux/slices/token-slice";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+
+const schema = yup
+  .object({
+    name: yup.string().required(),
+    email: yup.string().email().required(),
+    password: yup.string().min(6).required(),
+    confirm_password: yup.string().min(6).required(),
+    check: yup.boolean().isTrue().required(),
+  })
+  .required();
 
 const Register = () => {
-  const dispatch = useDispatch();
+  const [eye, setEye] = useState({
+    password: false,
+    confirm_password: false,
+  });
+  const dipatch = useDispatch();
   const navigate = useNavigate();
-  const [error, setError] = useState("");
 
-  const handleSignUp = (e) => {
-    e.preventDefault();
-    let formData = new FormData(e.target);
-    let user = Object.fromEntries(formData);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    mode: "onBlur",
+  });
 
-    if (user.password !== user.confirm_password) {
-      setError("Passwords do not match!");
-      return;
-    }
+  const onSignUp = (data) => {
+    delete data.check;
 
     request
-      .post("/auth/signup-admin", user)
+      .post("/auth/signup-admin", data)
       .then((res) => {
-        dispatch(signIn(res.data.access_token));
-        navigate("/admin");
-        e.target.reset();
-        setError("");
+        console.log(res);
+        dipatch(signIn(res.data.access_token));
+        navigate("/admin/create-product");
       })
-      .catch((err) => {
-        return setError(err.response.data.message.message);
-      });
+      .catch((err) => alert(err?.response?.data?.message?.message));
   };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        <form onSubmit={handleSignUp} className="flex flex-col gap-4">
-          <div>
+    <div className="w-full min-h-screen grid grid-cols-2 max-[850px]:grid-cols-1">
+      <div className='bg-[url("src/assets/regester/register.png")] bg-cover max-[850px]:hidden bg-center bg-no-repeat'></div>
+      <div className="flex max-[1100px]:p-10 max-[500px]:p-5 items-center pl-[87px]">
+        <form
+          onSubmit={handleSubmit(onSignUp)}
+          className="max-w-[456px] max-[850px]:max-w-full w-full"
+          action=""
+        >
+          <p className="text-[40px] font-medium mb-6">Sign Up</p>
+          <p className="text-slate-400 mb-8">
+            Already have an account?
+            <Link className="text-green-500" to={"/login"}>
+              {" "}
+              Sign in
+            </Link>
+          </p>
+          <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
             <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
+              {...register("name")}
               type="text"
-              name="name"
-              placeholder="Name"
+              className="w-full border-b h-10 outline-none focus:border-green-500"
+              placeholder="Your name"
             />
-          </div>
-          <div>
+            {errors.name && (
+              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            )}
+          </label>
+          <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
             <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
+              {...register("email")}
               type="email"
-              name="email"
+              className="w-full border-b h-10 outline-none focus:border-green-500"
               placeholder="Email"
             />
-          </div>
-          <div>
+            {errors.email && (
+              <p className="text-red-500 text-sm">{errors.email.message}</p>
+            )}
+          </label>
+          <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
+            <div className="relative ">
+              <input
+                {...register("password")}
+                type={eye.password ? "text" : "password"}
+                className="w-full border-b h-10 outline-none focus:border-green-500"
+                placeholder="Password"
+              />
+              {watch("password") && (
+                <span
+                  onClick={() =>
+                    setEye((prev) => ({ ...prev, password: !prev.password }))
+                  }
+                  className="absolute select-none top-[50%] translate-y-[-50%] right-0 text-xl cursor-pointer"
+                >
+                  {eye.password ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                </span>
+              )}
+            </div>
+            {errors.password && (
+              <p className="text-red-500 text-sm">{errors.password.message}</p>
+            )}
+          </label>
+          <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
+            <div className="relative ">
+              <input
+                {...register("confirm_password")}
+                type={eye.confirm_password ? "text" : "password"}
+                className="w-full border-b h-10 outline-none focus:border-green-500"
+                placeholder="Confirm Password"
+              />
+              {watch("confirm_password") && (
+                <span
+                  onClick={() =>
+                    setEye((prev) => ({
+                      ...prev,
+                      confirm_password: !prev.confirm_password,
+                    }))
+                  }
+                  className="absolute select-none top-[50%] translate-y-[-50%] right-0 text-xl cursor-pointer"
+                >
+                  {eye.confirm_password ? (
+                    <IoEyeOffOutline />
+                  ) : (
+                    <IoEyeOutline />
+                  )}
+                </span>
+              )}
+            </div>
+            {errors.confirm_password && (
+              <p className="text-red-500 text-sm">
+                {errors.confirm_password.message}
+              </p>
+            )}
+          </label>
+
+          <label className="flex  items-center gap-3" htmlFor="register-check">
             <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-              type="password"
-              name="password"
-              placeholder="Password"
+              {...register("check")}
+              id="register-check"
+              type="checkbox"
+              className="w-6 h-6 max-[500px]:w-4 max-[500px]:h-4"
             />
-          </div>
-          <div>
-            <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-              type="password"
-              name="confirm_password"
-              placeholder="Confirm Password"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-300"
-          >
+            <span>
+              I agree with{" "}
+              <b className="hover:underline cursor-pointer">Privacy Policy</b>{" "}
+              and <b className="hover:underline cursor-pointer">Terms of Use</b>
+            </span>
+          </label>
+          {errors.check && (
+            <p className="text-red-500 text-sm">You must agree with turm</p>
+          )}
+          <button className="w-full h-12 mt-8 max-[500px]:mt-4 bg-black text-white rounded-md hover:opacity-70">
             Sign Up
           </button>
         </form>

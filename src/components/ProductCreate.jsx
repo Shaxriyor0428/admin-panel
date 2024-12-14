@@ -10,6 +10,7 @@ const ProductCreate = () => {
     let formData = new FormData(e.target);
     const product = Object.fromEntries(formData);
 
+    console.log(product);
     product.price = parseFloat(product.price);
     product.categoryId = parseInt(product.categoryId, 10);
     product.stock = parseInt(product.stock, 10);
@@ -18,13 +19,13 @@ const ProductCreate = () => {
     request
       .post("/product/create", product)
       .then((res) => {
-        // console.log(res);
+        console.log(res);
         setError("");
         e.target.reset();
         alert("Product created successfully");
       })
       .catch((err) =>
-        setError(err.response?.data?.message || "Something went wrong")
+        setError("Something went wrong")
       );
   };
 

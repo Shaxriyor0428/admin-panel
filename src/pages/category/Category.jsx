@@ -56,7 +56,7 @@ const Category = () => {
       });
       setCategoryData(initialState);
       alert("You successfully created category");
-      navigate("/see-category");
+      navigate("/admin/manage-category");
     } catch (err) {
       alert(err.response.data?.message.message);
     }

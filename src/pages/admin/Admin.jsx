@@ -41,6 +41,14 @@ const Admin = () => {
               <span>Create Category</span>
             </NavLink>
           </li>
+          <li>
+            <NavLink
+              className="block p-3 rounded-md mb-2"
+              to={"see-one-category"}
+            >
+              <span>See one category By ID</span>
+            </NavLink>
+          </li>
         </ul>
       </div>
       <div className="flex-1 p-6 ">

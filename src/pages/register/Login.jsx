@@ -1,78 +1,135 @@
+import { request } from "@/api";
 import React, { useState } from "react";
-import { request } from "../../api";
 import { useDispatch } from "react-redux";
-import { signIn } from "../../redux/slices/token-slice";
-import { useNavigate } from "react-router-dom";
+import { signIn } from "@/redux/slices/token-slice";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { toast } from "react-hot-toast";
+const schema = yup
+  .object({
+    email: yup.string().email().required(),
+    password: yup.string().required(),
+    check: yup.boolean().isTrue().required(),
+  })
+  .required();
 
-const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+const Register = () => {
+  const [eye, setEye] = useState({
+    password: false,
+  });
+  const dipatch = useDispatch();
   const navigate = useNavigate();
-  const [error, setError] = useState("");
 
-  const handleSignIn = (event) => {
-    event.preventDefault();
-    let formData = new FormData(event.target);
-    const user = Object.fromEntries(formData);
-    setLoading(true);
-    setError("");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    mode: "onBlur",
+  });
+  console.log(watch("password"));
+
+  const onSignUp = (data) => {
+    delete data.check;
 
     request
-      .post("/auth/signin-admin", user)
+      .post("/auth/signin-admin", data)
       .then((res) => {
-        dispatch(signIn(res.data.access_token));
-        event.target.reset();
-        navigate("/create-category");
+        toast.success("Successfully login in!");
+        dipatch(signIn(res.data.access_token));
+        navigate("/admin/create-product");
       })
-      .catch((err) => {
-        setError(
-          err.response.data?.message.message || "Login failed. Please try again."
-        );
-      })
-      .finally(() => setLoading(false));
+      .catch((err) => alert(err?.response?.data?.message?.message));
   };
-
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-bold mb-6 text-center text-gray-700">
-          Login
-        </h2>
-
-        {error && <div className="mb-4 text-red-500 text-center">{error}</div>}
-
-        <form onSubmit={handleSignIn} className="flex flex-col gap-4">
-          <div>
-            <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-              type="email"
-              name="email"
-              placeholder="Email"
-            />
-          </div>
-
-          <div>
-            <input
-              className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-              required
-              type="password"
-              name="password"
-              placeholder="Password"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-300"
-            disabled={loading}
+    <>
+      <div className="w-full min-h-screen grid grid-cols-2 max-[850px]:grid-cols-1">
+        <div className='bg-[url("src/assets/regester/register.png")] bg-cover max-[850px]:hidden bg-center bg-no-repeat'></div>
+        <div className="flex max-[1100px]:p-10 max-[500px]:p-5 items-center pl-[87px]">
+          <form
+            onSubmit={handleSubmit(onSignUp)}
+            className="max-w-[456px] max-[850px]:max-w-full w-full"
+            action=""
           >
-            {loading ? "Loading..." : "Submit"}
-          </button>
-        </form>
+            <p className="text-[40px] font-medium mb-6">Sign In</p>
+            <p className="text-slate-400 mb-8">
+              Already have an account?
+              <Link className="text-green-500" to={"/register"}>
+                {" "}
+                Sign Up
+              </Link>
+            </p>
+
+            <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
+              <input
+                {...register("email")}
+                type="email"
+                className="w-full border-b h-10 outline-none focus:border-green-500"
+                placeholder="Email"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email.message}</p>
+              )}
+            </label>
+            <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
+              <div className="relative ">
+                <input
+                  {...register("password")}
+                  type={eye.password ? "text" : "password"}
+                  className="w-full border-b h-10 outline-none focus:border-green-500"
+                  placeholder="Password"
+                />
+                {watch("password") && (
+                  <span
+                    onClick={() =>
+                      setEye((prev) => ({ ...prev, password: !prev.password }))
+                    }
+                    className="absolute select-none top-[50%] translate-y-[-50%] right-0 text-xl cursor-pointer"
+                  >
+                    {eye.password ? <IoEyeOffOutline /> : <IoEyeOutline />}
+                  </span>
+                )}
+              </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {errors.password.message}
+                </p>
+              )}
+            </label>
+
+            <label
+              className="flex  items-center gap-3"
+              htmlFor="register-check"
+            >
+              <input
+                {...register("check")}
+                id="register-check"
+                type="checkbox"
+                className="w-6 h-6 max-[500px]:w-4 max-[500px]:h-4"
+              />
+              <span>
+                I agree with{" "}
+                <b className="hover:underline cursor-pointer">Privacy Policy</b>{" "}
+                and{" "}
+                <b className="hover:underline cursor-pointer">Terms of Use</b>
+              </span>
+            </label>
+            {errors.check && (
+              <p className="text-red-500 text-sm">You must agree with turm</p>
+            )}
+            <button className="w-full h-12 mt-8 max-[500px]:mt-4 bg-black text-white rounded-md hover:opacity-70">
+              Sign In
+            </button>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
-export default Login;
+export default Register;
