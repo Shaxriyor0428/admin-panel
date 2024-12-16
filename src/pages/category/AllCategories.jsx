@@ -29,7 +29,7 @@ const AllCategories = () => {
   const handleDelete = async (id) => {
     try {
       if (confirm("Do you really want delete this category? Are you Sure ?")) {
-        const res = await request.delete(`product-category/delete/${id}`, {
+        const res = await request.delete(`/product-category/delete/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
