@@ -10,7 +10,8 @@ import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 
 const schema = yup
   .object({
-    name: yup.string().required(),
+    first_name: yup.string().required(),
+    last_name: yup.string().required(),
     email: yup.string().email().required(),
     password: yup.string().min(6).required(),
     confirm_password: yup.string().min(6).required(),
@@ -35,22 +36,20 @@ const Register = () => {
     resolver: yupResolver(schema),
     mode: "onBlur",
   });
+  console.log(watch("password"));
 
   const onSignUp = (data) => {
     delete data.check;
 
-    request
-      .post("/auth/signup-admin", data)
-      .then((res) => {
-        console.log(res);
-        dipatch(signIn(res.data.access_token));
-        navigate("/admin/create-product");
-      })
-      .catch((err) => alert(err?.response?.data?.message?.message));
+    request.post("/auth/signup-customer", data).then((res) => {
+      console.log(res);
+      dipatch(signIn(res.data.access_token));
+      navigate("/");
+    });
   };
   return (
     <div className="w-full min-h-screen grid grid-cols-2 max-[850px]:grid-cols-1">
-      <div className='bg-[url("src/assets/regester/register.png")] bg-cover max-[850px]:hidden bg-center bg-no-repeat'></div>
+      <div className="bg-register bg-cover max-[850px]:hidden bg-center bg-no-repeat"></div>
       <div className="flex max-[1100px]:p-10 max-[500px]:p-5 items-center pl-[87px]">
         <form
           onSubmit={handleSubmit(onSignUp)}
@@ -67,13 +66,26 @@ const Register = () => {
           </p>
           <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
             <input
-              {...register("name")}
+              {...register("first_name")}
               type="text"
               className="w-full border-b h-10 outline-none focus:border-green-500"
-              placeholder="Your name"
+              placeholder="First name"
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
+            {errors.first_name && (
+              <p className="text-red-500 text-sm">
+                {errors.first_name.message}
+              </p>
+            )}
+          </label>
+          <label className="block mb-8 max-[500px]:mb-4" htmlFor="">
+            <input
+              {...register("last_name")}
+              type="text"
+              className="w-full border-b h-10 outline-none focus:border-green-500"
+              placeholder="Last name"
+            />
+            {errors.last_name && (
+              <p className="text-red-500 text-sm">{errors.last_name.message}</p>
             )}
           </label>
           <label className="block mb-8 max-[500px]:mb-4" htmlFor="">

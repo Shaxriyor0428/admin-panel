@@ -5,12 +5,13 @@ import { toggleDelete } from "../redux/slices/reload-slice";
 import { useDispatch } from "react-redux";
 import Modal from "../pages/admin/Modal";
 import ProductEdit from "../pages/admin/ProductEdit";
+import { useNavigate } from "react-router-dom";
 
 const Products = ({ data, isAdmin }) => {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-
+  const navigate = useNavigate();
   const handleDelete = async (id) => {
     try {
       if (confirm("Are you sure?")) {
@@ -29,12 +30,17 @@ const Products = ({ data, isAdmin }) => {
     setOpen(true);
   };
 
+  const handleImage = (prod) => {
+    navigate(`/detail/${prod.id}`);
+  };
+
   const productItems = data?.map((product) => (
     <div
       key={product.id}
       className="w-80 p-4 border border-gray-200 rounded-lg shadow-lg bg-white hover:shadow-2xl transition-shadow duration-300"
     >
       <img
+        onClick={() => handleImage(product)}
         src={product.image}
         alt={product.name}
         className="w-full h-60 object-cover rounded-t-lg"

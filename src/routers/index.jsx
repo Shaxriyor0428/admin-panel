@@ -15,6 +15,7 @@ import ManageCategory from "../pages/admin/manage-category/ManageCategory";
 import CreateCategory from "../pages/admin/create-category/CreateCategory";
 import { useFetch } from "../hooks/useFetch";
 import Products from "../components/Products";
+import Detail from "../pages/detail/Detail";
 
 const Router = () => {
   const { data } = useFetch("/product/get");
@@ -24,6 +25,7 @@ const Router = () => {
         <Route index element={<Home />} />
         <Route path="login" element={<Login />} />
         <Route path="products" element={<Products data={data} />} />
+        <Route path="detail/:id" element={<Detail/>} />
       </Route>
 
       <Route path="/" element={<Auth />}>
