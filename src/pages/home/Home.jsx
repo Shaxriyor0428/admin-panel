@@ -12,7 +12,7 @@ import Instagram from "./Instagram";
 const Home = () => {
   const { data } = useFetch("/product/get");
   const { data: categories } = useFetch("/product/get");
-
+  
   return (
     <>
       <Hero />
@@ -25,9 +25,9 @@ const Home = () => {
         }}
         condition="NEW"
         isAdmin={false}
-        data={data}
+        data={data?.products}
       />
-      <Category data={categories} />
+      <Category data={categories?.products} />
       <Collection />
       <Products
         style={{
@@ -37,7 +37,7 @@ const Home = () => {
         }}
         title={{ name: "Best seller", style: "text-center" }}
         isAdmin={false}
-        data={data}
+        data={data?.products}
         condition="HOT"
       />
       <Banner />
