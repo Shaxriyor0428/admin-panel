@@ -12,7 +12,7 @@ import Instagram from "./Instagram";
 const Home = () => {
   const { data } = useFetch("/product/get");
   const { data: categories } = useFetch("/product/get");
-  
+  // console.log(data?.products);
   return (
     <>
       <Hero />
